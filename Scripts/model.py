@@ -68,7 +68,7 @@ class UNet(nn.Module):
     def __init__(self, im_chs, down_chs=(32, 64, 128), latent_dim=64, kernel_size=3, stride=1, padding=1):
         super(UNet, self).__init__()
 
-        IMG_SIZE = 128
+        IMG_SIZE = 16
         latent_image = IMG_SIZE // 4
         up_chs = down_chs[::-1]
 
@@ -95,13 +95,13 @@ class UNet(nn.Module):
         self.decoder1 = DecoderBlock(up_chs[0], up_chs[1])
         self.decoder2 = DecoderBlock(up_chs[1], up_chs[2])
 
-        self.back_to_original = nn.Sequential(nn.Conv2d(up_chs[2], im_chs, kernel_size, stride, padding), nn.ReLU())
+        self.back_to_original = nn.Sequential(nn.Conv2d(2*up_chs[2], im_chs, kernel_size, stride, padding), nn.ReLU())
 
 
     def forward(self, x):
-        x = self.img_conv(x)
+        img = self.img_conv(x)
 
-        enc1 = self.encoder1(x)
+        enc1 = self.encoder1(img)
         enc2 = self.encoder2(enc1)
 
         x = self.to_latent(enc2)
@@ -112,6 +112,6 @@ class UNet(nn.Module):
         x = self.decoder1(x, enc2)
         x = self.decoder2(x, enc1)
 
-        x = self.back_to_original(x)
+        x = self.back_to_original(torch.cat((img, x), 1))
 
         return x

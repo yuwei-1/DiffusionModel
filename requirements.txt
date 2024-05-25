@@ -1,3 +1,5 @@
 torch
 numpy
 pandas
+torchvision
+matplotlib
