@@ -1,2 +1,6 @@
 /CourseMaterials
 /Data
+
+# pyc files
+
+*.pyc

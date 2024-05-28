@@ -29,7 +29,7 @@ class EmbeddingBlock(nn.Module):
                         nn.ReLU(),
                         nn.Linear(latent_dim, latent_dim),
                         nn.ReLU(),
-                        nn.Linear(latent_dim, input_dim)
+                        nn.Unflatten(1, (latent_dim, 1, 1))
                     )
 
     def forward(self, x):
@@ -71,6 +71,8 @@ class UNet(nn.Module):
         IMG_SIZE = 16
         latent_image = IMG_SIZE // 4
         up_chs = down_chs[::-1]
+        t_dim = 1
+        self.T = 100
 
         self.img_conv = nn.Sequential(
             nn.Conv2d(im_chs, down_chs[0], kernel_size, stride, padding),
@@ -92,13 +94,16 @@ class UNet(nn.Module):
         
         self.img_reshape = nn.Unflatten(1, (up_chs[0], latent_image, latent_image))
 
+        self.emb_t1 = EmbeddingBlock(t_dim, up_chs[0])
+        self.emb_t2 = EmbeddingBlock(t_dim, up_chs[1])
+
         self.decoder1 = DecoderBlock(up_chs[0], up_chs[1])
         self.decoder2 = DecoderBlock(up_chs[1], up_chs[2])
 
         self.back_to_original = nn.Sequential(nn.Conv2d(2*up_chs[2], im_chs, kernel_size, stride, padding), nn.ReLU())
 
 
-    def forward(self, x):
+    def forward(self, x, t):
         img = self.img_conv(x)
 
         enc1 = self.encoder1(img)
@@ -109,8 +114,11 @@ class UNet(nn.Module):
         x = self.compression(x)
         x = self.img_reshape(x)
 
-        x = self.decoder1(x, enc2)
-        x = self.decoder2(x, enc1)
+        emb_t1 = self.emb_t1(t/self.T)
+        emb_t2 = self.emb_t2(t/self.T)
+
+        x = self.decoder1(x + emb_t1, enc2)
+        x = self.decoder2(x + emb_t2, enc1)
 
         x = self.back_to_original(torch.cat((img, x), 1))
 
