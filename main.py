@@ -1,6 +1,6 @@
 import sys
 import torch
-from Scripts.model import UNetv1
+from Scripts.model import UNetv1, UNetv2
 from torch.utils.data import DataLoader
 from Utils.training_utils import DiffusionUtils
 import matplotlib.pyplot as plt
@@ -33,7 +33,8 @@ if __name__ == "__main__":
 
     utils = DiffusionUtils(start, end, diffusion_time=T, device=device)
 
-    model = UNetv1(IMG_CHANNELS, down_chs=(16, 32, 64)).to(device)
+    #model = UNetv1(IMG_CHANNELS, down_chs=(16, 32, 64)).to(device)
+    model = UNetv2(IMG_CHANNELS, down_chs=(16, 32, 64)).to(device)
     model.train()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 

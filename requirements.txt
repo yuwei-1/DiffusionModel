@@ -4,3 +4,4 @@ pandas
 torchvision
 matplotlib
 pytest
+einops

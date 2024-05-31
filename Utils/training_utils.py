@@ -20,9 +20,9 @@ class DiffusionUtils:
         noisy_img = image*image_coeff + noise*noise_coeff
         return noisy_img, noise
     
-    def reverse_diffusion(self, model, x_t, time, random_init=True):
+    def reverse_diffusion(self, model, x_t, time, *model_args, random_init=True):
         t = time.item()
-        pred_noise = model(x_t, time)
+        pred_noise = model(x_t, time, *model_args)
         norm_coeff = (1/torch.sqrt(self.a[t]))
         mu = norm_coeff*(x_t - pred_noise*self.diffusion_noise_coeff[t])
         if t == 0:

@@ -4,3 +4,6 @@
 # pyc files
 */__pycache__/*
 *.pyc
+
+/.vscode
+/.vscode/*
