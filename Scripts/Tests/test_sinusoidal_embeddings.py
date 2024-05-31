@@ -4,7 +4,7 @@ import math
 import sys
 import torch.nn as nn
 from unittest.mock import patch, MagicMock
-from Scripts.embedding_blocks import SinusoidalPositionalEmbedding
+from Scripts.embedding_blocks import SinusoidalPositionEmbeddingBlock
 sys.path.append('..')
 
 
@@ -13,7 +13,7 @@ class TestSinusoidalEmbeddings(unittest.TestCase):
     def test_positional_encodings(self):
         time_embed_dim = 10
         T=150
-        penc = SinusoidalPositionalEmbedding(time_embed_dim)
+        penc = SinusoidalPositionEmbeddingBlock(time_embed_dim)
         t = torch.randint(0, T, (128,1))
         out = penc(t)
 

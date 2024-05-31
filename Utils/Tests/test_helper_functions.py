@@ -1,9 +1,8 @@
 import unittest
 import sys
 import torch
-
 # sys.path.append('..')
-from Utils.helper import compute_a_bar, compute_diffusion_noise_coefficient
+from Utils.helper_functions import compute_a_bar, compute_diffusion_noise_coefficient
 
 
 class TestHelperFunctions(unittest.TestCase):

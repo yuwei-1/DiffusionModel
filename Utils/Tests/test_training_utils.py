@@ -1,7 +1,7 @@
 import unittest
 import torch
 from unittest.mock import patch, MagicMock
-from Utils.training_utils import DiffusionUtils
+from Utils.diffusion_utils import DiffusionUtils
 
 
 class TestTrainingUtils(unittest.TestCase):

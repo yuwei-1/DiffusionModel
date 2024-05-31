@@ -44,9 +44,9 @@ class ClassEmbeddingBlock(nn.Module):
         self.num_classes = num_classes
         self.prob = prob
 
-    def forward(self, c):
+    def forward(self, c, mask=True):
         encoded_classes = F.one_hot(c, num_classes=self.num_classes)
-        if self.training == False:
+        if mask is False:
             bernoulli_mask = torch.ones_like(encoded_classes, dtype=torch.float32)
         else:
             bernoulli_mask = torch.bernoulli(torch.full_like(encoded_classes, self.prob, dtype=torch.float32))

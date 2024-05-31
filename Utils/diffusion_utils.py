@@ -1,5 +1,5 @@
 import torch
-from Utils.helper import compute_a_bar, compute_diffusion_noise_coefficient, compute_reverse_diffusion_uncertainty
+from Utils.helper_functions import compute_a_bar, compute_diffusion_noise_coefficient, compute_reverse_diffusion_uncertainty
 
 
 class DiffusionUtils:
@@ -20,11 +20,21 @@ class DiffusionUtils:
         noisy_img = image*image_coeff + noise*noise_coeff
         return noisy_img, noise
     
-    def reverse_diffusion(self, model, x_t, time, *model_args, random_init=True):
+    def predict_basic_noise(self, model, x_t, time):
+        e_t = model(x_t, time)
+        return e_t
+    
+    def predict_class_noise(self, model, x_t, time, class_vector, w):
+        avg_vector = torch.zeros_like(class_vector)
+        e_t_cls = model(x_t, time, class_vector)
+        e_t_nocls = model(x_t, time, avg_vector)
+        e_t = (1 + w) * e_t_cls - w * e_t_nocls
+        return e_t
+    
+    def reverse_diffusion(self, x_t, e_t, time, random_init=True):
         t = time.item()
-        pred_noise = model(x_t, time, *model_args)
         norm_coeff = (1/torch.sqrt(self.a[t]))
-        mu = norm_coeff*(x_t - pred_noise*self.diffusion_noise_coeff[t])
+        mu = norm_coeff*(x_t - e_t*self.diffusion_noise_coeff[t])
         if t == 0:
             return mu
         else:

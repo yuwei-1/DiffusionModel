@@ -2,10 +2,10 @@ import sys
 import torch
 from Scripts.model import UNetv1, UNetv2
 from torch.utils.data import DataLoader
-from Utils.training_utils import DiffusionUtils
+from Utils.diffusion_utils import DiffusionUtils
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
-from Utils.helper import load_transformed_FashionMNIST, load_transformed_MNIST
+from Utils.helper_functions import load_transformed_FashionMNIST, load_transformed_MNIST
 
 
 if __name__ == "__main__":
@@ -46,7 +46,8 @@ if __name__ == "__main__":
         x_t = torch.randn((1, 1, IMG_SIZE, IMG_SIZE)).to(device)
         for t in range(0, T)[::-1]:
             time = torch.tensor([[t]]).to(device)
-            x_t = utils.reverse_diffusion(model, x_t, time, random_init=True)
+            e_t = utils.predict_basic_noise(model, x_t, time)
+            x_t = utils.reverse_diffusion(x_t, e_t, time, random_init=True)
             if t % n_cols == 0:
                 ax = fig.add_subplot(1, intervals, i)
                 ax.imshow(x_t.squeeze().cpu().numpy())

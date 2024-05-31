@@ -103,8 +103,6 @@ class UNetv2(nn.Module):
                                       nn.GELU())
 
         self.sin_pos_encoding = SinusoidalPositionEmbeddingBlock(time_embed_dim)
-        self.class_embedder = ClassEmbeddingBlock(num_classes)
-
         self.emb_t1 = EmbeddingBlockv1(time_embed_dim, up_chs[0])
         self.emb_t2 = EmbeddingBlockv1(time_embed_dim, up_chs[1])
         self.emb_c1 = EmbeddingBlockv1(num_classes, up_chs[0])
@@ -129,10 +127,8 @@ class UNetv2(nn.Module):
         sin_emb = self.sin_pos_encoding(t)
         emb_t1 = self.emb_t1(sin_emb)
         emb_t2 = self.emb_t2(sin_emb)
-
-
-        emb_c1 = self.emb_c1(self.class_embedder(c))
-        emb_c2 = self.emb_c2(self.class_embedder(c))
+        emb_c1 = self.emb_c1(c)
+        emb_c2 = self.emb_c2(c)
     
         x = self.decoder0(x)
         x = self.decoder1(x*emb_c1 + emb_t1, enc2)
